@@ -37,7 +37,10 @@ app.get('/client.js', function(request, response) {
 
 /******************* socket handlers ********************/
 io.on('connection', function(socket) {
+    var username = 'lurker';
+    socket.broadcast.emit('beware! a lurker has joined!');
     console.log('a user connected');
+    
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });
@@ -50,6 +53,16 @@ io.on('connection', function(socket) {
         //sending to all 
         io.emit('chat', JSON.stringify(msgData));
     });
+    //tracking if the user is typing or not
+    socket.on('meta:typing', function(data){
+        metaData = JSON.parse(data
+        //metadata includes user who is or is not typing
+        // looks like {'username': 'blah', 'isTyping': false}
+        //only telling other sockets
+        socket.broadcast.emit('meta:typing', metaData);
+        
+    });
+    
 });
 
 
