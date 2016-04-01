@@ -15,7 +15,7 @@ var ChannelManager = (function(){
     
     return {
         'addMessage': function(msgData){
-            channels[msgData.channel].push(messageData);
+            channels[msgData.channel].push(msgData);
         },
         'addChannel': function(channelName){
             if (channelName in channels){
@@ -36,14 +36,19 @@ app.get('/client.js', function(request, response) {
 });
 
 /******************* socket handlers ********************/
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
     console.log('a user connected');
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });
     socket.on('chat', function(data){
-        msgData = JSON.parse(data);
-        ChannelManager.
+        var msgData = JSON.parse(data);
+        msgData['date_recieved'] = Date.now();
+        ChannelManager.addMessage(msgData);
+        
+        console.log('chat recieved: ' + data);
+        //sending to all 
+        io.emit('chat', JSON.stringify(msgData));
     });
 });
 
