@@ -28,8 +28,10 @@ app.factory('$socket', function ($rootScope) {
 });
 
 /*************** controller *********************/
-function CareZoneChatController($scope, $http, $socket){
+function CareZoneChatController($scope, $http, $socket, $timeout){
     $scope.messages = [];
+    $scope.typing = false;
+    $scope.typingUsers = [];
     $scope.username = '';
     $scope.currentChannel = 'General';
     $scope.sendMessage = function(){
@@ -41,10 +43,48 @@ function CareZoneChatController($scope, $http, $socket){
             });
             $socket.emit('chat', data);
             $scope.message = '';
+            $scope.typing = false;
+            $socket.emit('meta:typing', JSON.stringify({
+                    'username': $scope.username,
+                    'isTyping': false
+            }));
         }
     };
+    $scope.$watch('message', function(){
+        var msgAsOfKeyUp = $scope.message;
+        if (!msgAsOfKeyUp) {
+            return; 
+        }
+        if ($scope.typing == false){
+            $socket.emit('meta:typing', JSON.stringify({
+                'username': $scope.username,
+                'isTyping': true
+            }));
+            $scope.typing = true;
+        }
+        
+        $timeout(function(){
+            if (msgAsOfKeyUp == $scope.message && $scope.typing){
+                $socket.emit('meta:typing', JSON.stringify({
+                    'username': $scope.username,
+                    'isTyping': false
+                }));
+                $scope.typing = false;
+            }
+        }, 10000);
+    });
     $socket.on('chat', function(data){
         var msgData = JSON.parse(data);
         $scope.messages.push(msgData);
+    });
+    $socket.on('meta:typing', function(data) {
+        var metaData = JSON.parse(data);
+        var index = $scope.typingUsers.indexOf(metaData.username);
+        if (metaData.isTyping && index == -1){
+            $scope.typingUsers.push(metaData.username);
+        }
+        else if (index >= 0 && !metaData.isTyping){
+            $scope.typingUsers.splice(index, 1);
+        }
     });
 }

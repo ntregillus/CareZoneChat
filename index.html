@@ -15,9 +15,12 @@
       <li ng-repeat="msg in messages">
         {{msg.username}}: {{msg.message}}
       </li>
+      <li ng-repeat="user in typingUsers">
+        {{user}} is typing
+      </li>
     </ul>
     <form ng-submit="sendMessage()">
-      <input autocomplete="off" ng-model="message" />
+      <input ng-model="message" />
       <input type="submit" value="send"/>
     </form>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>

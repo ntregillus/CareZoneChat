@@ -61,6 +61,7 @@ io.on('connection', function(socket) {
     
     socket.on('disconnect', function() {
         console.log('user disconnected');
+        socket.broadcast.emit('chat', ChannelManager.generateSystemMessage(username + ' has logged off'))
     });
     socket.on('chat', function(data){
         var msgData = JSON.parse(data);
@@ -81,6 +82,7 @@ io.on('connection', function(socket) {
     });
     //tracking if the user is typing or not
     socket.on('meta:typing', function(data){
+        console.log('recieved typing notiifcation: ' + data);
         //metadata includes user who is or is not typing
         // looks like {'username': 'blah', 'isTyping': false}
         //only telling other sockets
@@ -92,6 +94,13 @@ io.on('connection', function(socket) {
 
 // TODO: code written to run in Cloud9 IDE. need to create wrapper for 
 // could 9 ide configuration settings (e.g: process.env.PORT)
+if (!process){
+    process = {
+        'env': {
+            'PORT': 8080
+        }
+    };
+}
 http.listen(process.env.PORT, function(){
    console.log('listening on *:' + process.env.PORT); 
 });
