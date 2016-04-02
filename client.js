@@ -3,6 +3,9 @@
 var app = angular.module('CareZoneChat', []);
 
 /*************** angular socket wrapper **********/
+// this is needed due to the angular processing pipeline.
+// aka socket could return at an unfortunate time, and needs
+// to be applied at the correct time for the controller to handle
 app.factory('$socket', function ($rootScope) {
   var socket = io.connect();
   return {
@@ -27,6 +30,7 @@ app.factory('$socket', function ($rootScope) {
   };
 });
 
+
 /*************** controller *********************/
 function CareZoneChatController($scope, $http, $socket, $timeout){
     $scope.messages = [];
@@ -34,6 +38,7 @@ function CareZoneChatController($scope, $http, $socket, $timeout){
     $scope.typingUsers = [];
     $scope.username = '';
     $scope.currentChannel = 'General';
+    // angular setup
     $scope.sendMessage = function(){
         if ($scope.message.length > 0) {
             var data = JSON.stringify({
@@ -73,6 +78,8 @@ function CareZoneChatController($scope, $http, $socket, $timeout){
             }
         }, 10000);
     });
+    
+    // client sockets 
     $socket.on('chat', function(data){
         var msgData = JSON.parse(data);
         $scope.messages.push(msgData);
