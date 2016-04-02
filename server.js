@@ -91,9 +91,8 @@ io.on('connection', function(socket) {
     
 });
 
-
-// TODO: code written to run in Cloud9 IDE. need to create wrapper for 
-// could 9 ide configuration settings (e.g: process.env.PORT)
+// could 9 ide configuration settings (e.g: process.env.PORT) 
+// if not running in cloud 9 then 
 if (!process){
     process = {
         'env': {
