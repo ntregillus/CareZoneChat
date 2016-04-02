@@ -22,6 +22,19 @@ var ChannelManager = (function(){
                 throw "channel " + channelName + " already exists";
             }
             channels[channelName] = [];
+        },
+        'generateSystemMessage': function(msg){
+            return JSON.stringify({
+                'username': 'system',
+                'date_recieved': Date.now(),
+                'message': msg
+            });
+        },
+        'getChannel': function(channelName){
+            if (!(channelName in channels)){
+                return [];
+            }
+            return channels[channelName];
         }
     }
 })();
@@ -38,14 +51,27 @@ app.get('/client.js', function(request, response) {
 /******************* socket handlers ********************/
 io.on('connection', function(socket) {
     var username = 'lurker';
-    socket.broadcast.emit('beware! a lurker has joined!');
+    socket.broadcast.emit('chat', ChannelManager.generateSystemMessage('beware! a lurker has joined!'));
     console.log('a user connected');
+    var existingMsgs = ChannelManager.getChannel('General');
+    for (var i = 0; i < existingMsgs.length; i++){
+        //sending old chat messages to new client
+        socket.emit('chat', JSON.stringify(existingMsgs[i]));
+    }
     
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });
     socket.on('chat', function(data){
         var msgData = JSON.parse(data);
+        if (username != msgData['username']){
+            socket.broadcast.emit('chat',
+                ChannelManager.generateSystemMessage(
+                'a lurker has identified themselves as ' + msgData['username']
+            ));
+            username = msgData['username'];
+        }
+        
         msgData['date_recieved'] = Date.now();
         ChannelManager.addMessage(msgData);
         
@@ -55,12 +81,10 @@ io.on('connection', function(socket) {
     });
     //tracking if the user is typing or not
     socket.on('meta:typing', function(data){
-        metaData = JSON.parse(data
         //metadata includes user who is or is not typing
         // looks like {'username': 'blah', 'isTyping': false}
         //only telling other sockets
-        socket.broadcast.emit('meta:typing', metaData);
-        
+        socket.broadcast.emit('meta:typing', data);
     });
     
 });
