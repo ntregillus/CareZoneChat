@@ -98,13 +98,14 @@ io.on('connection', function(socket) {
 
 // could 9 ide configuration settings (e.g: process.env.PORT) 
 // if not running in cloud 9 then 
-if (!process){
-    process = {
-        'env': {
-            'PORT': 8080
-        }
-    };
+var port = process.env.PORT;
+if (port === undefined){
+   console.log('self hosting, using standard 8080');
+   port = 8080; 
+}else{
+    console.log('Cloud9 hosting, using port ' + port);
 }
-http.listen(process.env.PORT, function(){
-   console.log('listening on *:' + process.env.PORT); 
+
+http.listen(port, function(){
+   console.log('listening on *:' + port); 
 });
