@@ -87,4 +87,18 @@ function CareZoneChatController($scope, $http, $socket, $timeout){
             $scope.typingUsers.splice(index, 1);
         }
     });
+    $socket.on('disconnect', function(){
+        $scope.messages.push({
+            'username': 'system',
+            'date_recieved': Date.now(),
+            'message': 'server disconnected'
+        });
+    });
+    $socket.on('reconnect', function() {
+         $scope.messages.push({
+            'username': 'system',
+            'date_recieved': Date.now(),
+            'message': 'server reconnected'
+        });       
+    });
 }

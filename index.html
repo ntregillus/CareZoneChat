@@ -4,12 +4,13 @@
     <title>CareZone Chatt Demo</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      .channels { background:#555; padding:10px; width:250px; fixed: left; }
+      .channels { background:#555; padding:10px; width:100%; fixed: left; }
+      input { width: 100%; height: 50px; border: 1px solid #999999; padding: 5px; font-size:24px; }
     </style>
   </head>
-  <body ng-app="CareZoneChat" ng-controller="CareZoneChatController">
+  <body ng-app="CareZoneChat" ng-controller="CareZoneChatController" style="font-size:200%;">
     <div class="channels">
-       username: <input ng-model="username" type="text">
+       username: <input ng-model="username" type="text" style="width:100%">
     </div>
     <ul id="messages">
       <li ng-repeat="msg in messages">
@@ -19,10 +20,18 @@
         {{user}} is typing
       </li>
     </ul>
-    <form ng-submit="sendMessage()">
+    <form ng-submit="sendMessage()" ng-show="username">
       <input ng-model="message" />
       <input type="submit" value="send"/>
     </form>
+    <div ng-hide="username" style="font-weight:bold;">
+    <p>
+      Hello! welcome to the conversation! please enter a username, and you can
+    </p>
+    <p>
+      start adding to this great stupendous conversation!
+    </p>
+    </div>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
     <script type="text/javascript" src="/client.js"></script>

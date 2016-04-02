@@ -65,11 +65,16 @@ io.on('connection', function(socket) {
     });
     socket.on('chat', function(data){
         var msgData = JSON.parse(data);
+        if (!msgData['username']) {
+            //Do nothing
+            return;
+        }
         if (username != msgData['username']){
-            socket.broadcast.emit('chat',
-                ChannelManager.generateSystemMessage(
-                'a lurker has identified themselves as ' + msgData['username']
-            ));
+            var sysMsg =  'a lurker has identified themselves as ' + msgData['username'];
+            if (username != 'lurker'){
+                sysMsg = username + " changed their user name to " + msgData['username'];
+            }
+            socket.broadcast.emit('chat', ChannelManager.generateSystemMessage(sysMsg));
             username = msgData['username'];
         }
         
