@@ -1,14 +1,14 @@
 <!doctype html>
-<html>
+<html ng-app="CareZoneChat" ng-controller="CareZoneChatController">
   <head>
-    <title>CareZone Chatt Demo</title>
+    <title>{{pageTitle}}</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       .channels { background:#555; padding:10px; width:100%; fixed: left; }
       input { width: 100%; height: 50px; border: 1px solid #999999; padding: 5px; font-size:24px; }
     </style>
   </head>
-  <body ng-app="CareZoneChat" ng-controller="CareZoneChatController" style="font-size:200%;">
+  <body style="font-size:200%;">
     <div class="channels">
        username: <input ng-model="username" type="text" style="width:100%">
     </div>

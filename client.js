@@ -1,6 +1,12 @@
-
+/*global angular*/
+/*global io*/
 //var socket = io();
-var app = angular.module('CareZoneChat', []);
+var app = angular.module('CareZoneChat', [])
+.run(['$rootScope', '$document', function($rootScope, $document) {
+    $document[0].addEventListener("visibilitychange", function() {
+        $rootScope.$broadcast('$distracted', $document[0].hidden);
+    });
+}]);
 
 /*************** angular socket wrapper **********/
 // this is needed due to the angular processing pipeline.
@@ -38,6 +44,9 @@ function CareZoneChatController($scope, $http, $socket, $timeout){
     $scope.typingUsers = [];
     $scope.username = '';
     $scope.currentChannel = 'General';
+    $scope.unseenMessages = 0;
+    $scope.distracted = false;
+    $scope.pageTitle = 'CareZoneChat Demo';
     // angular setup
     $scope.sendMessage = function(){
         if ($scope.message.length > 0) {
@@ -78,11 +87,21 @@ function CareZoneChatController($scope, $http, $socket, $timeout){
             }
         }, 10000);
     });
-    
+    $scope.$on('$distracted', function(event, windowNotFocused) {
+        $scope.distracted = windowNotFocused;
+        if (!windowNotFocused){
+            $scope.unseenMessages = 0;
+            $scope.pageTitle = 'CareZoneChat Demo';
+        }
+    });
     // client sockets 
     $socket.on('chat', function(data){
         var msgData = JSON.parse(data);
         $scope.messages.push(msgData);
+        if ($scope.distracted){
+            $scope.unseenMessages++;
+            $scope.pageTitle = $scope.unseenMessages + ' Unseen messages';
+        }
     });
     $socket.on('meta:typing', function(data) {
         var metaData = JSON.parse(data);
